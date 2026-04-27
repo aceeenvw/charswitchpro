@@ -42,7 +42,6 @@
     "cswp.actions.toggle_author_note": "Toggle Author's Note",
     "cswp.actions.toggle_right_panel": "Toggle character panel",
     "cswp.actions.open_persona": "Open persona management",
-    "cswp.actions.open_worldinfo": "Open World Info",
     "cswp.actions.open_settings": "Open CharSwitch Pro settings",
     "cswp.tags.all": "All tags",
     "cswp.tags.clear": "Clear filter",

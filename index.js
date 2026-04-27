@@ -847,11 +847,6 @@ function buildActions() {
             run: () => ensureDrawerOpen('persona-management-button'),
         },
         {
-            title: t('cswp.actions.open_worldinfo'),
-            icon: 'fa-book',
-            run: () => ensureDrawerOpen('WorldInfo'),
-        },
-        {
             title: t('cswp.actions.open_settings'),
             icon: 'fa-gear',
             run: async () => {
