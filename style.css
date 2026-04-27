@@ -1,0 +1,574 @@
+/* CharSwitch Pro — CSS
+ * author: aceenvw
+ * v2.1.0 — full touch / mobile support
+ * All class prefixes use `cswp--`. */
+
+/* ============ Trigger avatar overlay ============ */
+#rightNavHolder > .drawer-toggle {
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    height: var(--cswp--iconSize);
+    width: var(--cswp--iconSize);
+}
+#rightNavHolder > .drawer-toggle.cswp--char::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    aspect-ratio: 1 / 1;
+    background-image: var(--cswp--avatar);
+    background-size: cover;
+    background-position: top center;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 0 black);
+    pointer-events: none;
+    opacity: 0.8;
+    transition: opacity 160ms ease, border-radius 160ms ease;
+}
+body:not(.cswp--nonDiscord) #rightNavHolder > .drawer-toggle.cswp--char:has(.drawer-icon.openIcon)::after {
+    border-radius: 40%;
+}
+#rightNavHolder > .drawer-toggle.cswp--char:hover::after {
+    opacity: 1;
+}
+#rightNavHolder > .drawer-toggle.cswp--char > .drawer-icon::before {
+    display: none;
+}
+
+/* ============ Quick menu ============ */
+.cswp--ctxBlocker {
+    cursor: default;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+}
+.cswp--ctxBlocker > .cswp--ctxMenu {
+    --cswp--y: 100vh;
+    position: absolute;
+    left: var(--nav-bar-width, 0);
+    bottom: calc(100vh - var(--cswp--y));
+    max-height: var(--cswp--y);
+    min-width: 240px;
+    max-width: 360px;
+    margin: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: hidden;
+    background: var(--SmartThemeBlurTintColor, #1a1a1a);
+    border: 1px solid var(--SmartThemeBorderColor, #333);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+}
+body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
+    flex-direction: column;
+    bottom: unset;
+    top: var(--cswp--y);
+    max-height: calc(100vh - var(--cswp--y));
+}
+.cswp--ctxSearch {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #333);
+    background: transparent;
+}
+.cswp--ctxSearch input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 4px;
+    background: var(--SmartThemeBlurTintColor, rgba(0, 0, 0, 0.3));
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 13px;
+    outline: none;
+}
+.cswp--ctxSearch input:focus {
+    border-color: var(--SmartThemeQuoteColor, #7aa);
+}
+.cswp--ctxTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #333);
+    max-height: 80px;
+    overflow-y: auto;
+}
+.cswp--ctxTag {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--SmartThemeBlurTintColor, rgba(255, 255, 255, 0.08));
+    color: var(--SmartThemeBodyColor, #ddd);
+    font-size: 11px;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    transition: opacity 120ms;
+}
+.cswp--ctxTag:hover { opacity: 1; }
+.cswp--ctxTag.cswp--tagActive {
+    background: var(--SmartThemeQuoteColor, #5a7a7a);
+    color: #fff;
+    opacity: 1;
+}
+.cswp--ctxList {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.cswp--ctxItem {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 12px;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 160ms, background 160ms;
+    border: none;
+    border-radius: 0;
+}
+.cswp--ctxItem:hover,
+.cswp--ctxItem.cswp--focused {
+    opacity: 1;
+    background: var(--SmartThemeBlurTintColor, rgba(255, 255, 255, 0.06));
+}
+.cswp--ctxAvatar {
+    width: var(--cswp--iconSize, 40px);
+    min-width: var(--cswp--iconSize, 40px);
+    aspect-ratio: 1 / 1;
+    background-size: cover;
+    background-position: top center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.cswp--ctxName {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cswp--ctxItem.cswp--fav > .cswp--ctxAvatar {
+    outline: 2px solid gold;
+}
+.cswp--ctxItem.cswp--fav > .cswp--ctxName {
+    color: gold;
+}
+.cswp--ctxEmpty {
+    padding: 16px;
+    text-align: center;
+    opacity: 0.5;
+    font-size: 12px;
+}
+
+/* ============ Command Palette ============ */
+.cswp--paletteOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 10001;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 12vh;
+    backdrop-filter: blur(2px);
+    animation: cswp--fadeIn 120ms ease-out;
+}
+@keyframes cswp--fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.cswp--palette {
+    width: min(640px, 92vw);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--SmartThemeBlurTintColor, #1a1a1a);
+    border: 1px solid var(--SmartThemeBorderColor, #333);
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    animation: cswp--slideDown 160ms ease-out;
+}
+@keyframes cswp--slideDown {
+    from { transform: translateY(-16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.cswp--paletteInputWrap {
+    position: relative;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #333);
+}
+.cswp--paletteInput {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 15px;
+    outline: none;
+}
+.cswp--paletteInput:focus {
+    border-color: var(--SmartThemeQuoteColor, #7aa);
+}
+.cswp--paletteInputIcon {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--SmartThemeBodyColor, #888);
+    pointer-events: none;
+    font-size: 14px;
+}
+.cswp--paletteResults {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+.cswp--paletteSection {
+    padding: 4px 0;
+}
+.cswp--paletteSectionHeader {
+    padding: 6px 16px 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    opacity: 0.5;
+    font-weight: 600;
+}
+.cswp--paletteItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background 120ms;
+}
+.cswp--paletteItem:hover,
+.cswp--paletteItem.cswp--focused {
+    background: var(--SmartThemeQuoteColor, #3a5a5a);
+}
+.cswp--paletteItemIcon {
+    width: 32px;
+    min-width: 32px;
+    aspect-ratio: 1 / 1;
+    background-size: cover;
+    background-position: top center;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--SmartThemeBodyColor, #ccc);
+}
+.cswp--paletteItemBody {
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+.cswp--paletteItemTitle {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cswp--paletteItemSubtitle {
+    font-size: 11px;
+    opacity: 0.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+.cswp--paletteItemMatch {
+    background: rgba(255, 220, 100, 0.25);
+    color: #ffe;
+    font-weight: 600;
+    border-radius: 2px;
+}
+.cswp--paletteFooter {
+    padding: 6px 16px;
+    border-top: 1px solid var(--SmartThemeBorderColor, #333);
+    font-size: 10px;
+    opacity: 0.5;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.cswp--paletteKbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: monospace;
+    font-size: 10px;
+    margin-right: 4px;
+}
+
+/* ============ Settings panel ============ */
+#cswp_settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#cswp_settings .cswp--settingsSection {
+    border: 1px solid var(--SmartThemeBorderColor, #333);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.15);
+}
+#cswp_settings .cswp--settingsSectionTitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 13px;
+    opacity: 0.9;
+}
+#cswp_settings label.checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+#cswp_settings .cswp--settingsRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+#cswp_settings .cswp--settingsRow label {
+    flex: 1 1 auto;
+}
+#cswp_settings input[type="number"],
+#cswp_settings input[type="text"] {
+    width: 120px;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 13px;
+}
+#cswp_settings .cswp--hotkeyInput {
+    font-family: monospace;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+}
+#cswp_settings .cswp--hotkeyInput.cswp--recording {
+    background: var(--SmartThemeQuoteColor, #5a3a3a);
+    color: #fff;
+}
+#cswp_settings .cswp--hint {
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: 4px;
+}
+
+/* ============ Chat preview tooltip ============ */
+.cswp--preview {
+    position: fixed;
+    max-width: 320px;
+    padding: 8px 12px;
+    background: var(--SmartThemeBlurTintColor, #222);
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 6px;
+    color: var(--SmartThemeBodyColor, #ddd);
+    font-size: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    z-index: 10002;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms;
+}
+.cswp--preview.cswp--previewVisible { opacity: 1; }
+.cswp--previewTitle {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 11px;
+    opacity: 0.7;
+}
+.cswp--previewSnippet {
+    line-height: 1.4;
+    max-height: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================
+ * v2.1.0 — MOBILE / TOUCH SUPPORT
+ * ============================================================ */
+
+/* ============ Floating action button (FAB) ============ */
+.cswp--fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    background: var(--SmartThemeQuoteColor, #3a5a5a);
+    color: var(--SmartThemeBodyColor, #fff);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 120ms, box-shadow 120ms, background 120ms;
+}
+.cswp--fab:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.cswp--fab:hover {
+    background: var(--SmartThemeQuoteColor, #4a6a6a);
+}
+.cswp--fab i { pointer-events: none; }
+
+/* ============ Mobile palette ============ */
+.cswp--paletteOverlay.cswp--paletteMobile {
+    padding-top: 0;
+    align-items: stretch;
+}
+.cswp--paletteOverlay.cswp--paletteMobile > .cswp--palette {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.cswp--paletteOverlay.cswp--paletteMobile .cswp--paletteInput {
+    font-size: 16px; /* prevents iOS zoom-on-focus */
+}
+.cswp--paletteOverlay.cswp--paletteMobile .cswp--paletteItem {
+    padding: 12px 16px;
+    min-height: 48px;
+}
+.cswp--paletteOverlay.cswp--paletteMobile .cswp--paletteItemIcon {
+    width: 40px;
+    min-width: 40px;
+    font-size: 16px;
+}
+.cswp--paletteOverlay.cswp--paletteMobile .cswp--paletteItemTitle {
+    font-size: 15px;
+}
+.cswp--paletteOverlay.cswp--paletteMobile .cswp--paletteFooter {
+    display: none; /* keyboard hints are meaningless on touch */
+}
+
+/* Safety: on landscape phones, keep the modal centered but full-width */
+@media (max-width: 768px) and (orientation: landscape) {
+    .cswp--paletteOverlay.cswp--paletteMobile > .cswp--palette {
+        max-height: 100vh;
+    }
+}
+
+/* ============ Mobile quick menu ============ */
+@media (max-width: 768px), (pointer: coarse) {
+    .cswp--ctxBlocker > .cswp--ctxMenu {
+        min-width: 82vw;
+        max-width: 92vw;
+        left: 4vw !important;
+        right: 4vw;
+        max-height: 72vh;
+    }
+    .cswp--ctxItem {
+        padding: 10px 14px;
+        min-height: 48px;
+        opacity: 0.85;
+    }
+    .cswp--ctxSearch input {
+        font-size: 16px; /* prevent iOS zoom */
+        padding: 10px 12px;
+    }
+    .cswp--ctxAvatar {
+        width: 42px;
+        min-width: 42px;
+    }
+    .cswp--ctxTag {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .cswp--ctxTags {
+        max-height: 96px;
+        gap: 6px;
+    }
+    .cswp--ctxName {
+        font-size: 14px;
+    }
+}
+
+/* ============ Mobile settings panel ============ */
+@media (max-width: 768px), (pointer: coarse) {
+    #cswp_settings label.checkbox_label,
+    #cswp_settings .cswp--settingsRow {
+        padding: 8px 0;
+        min-height: 44px;
+        align-items: center;
+    }
+    #cswp_settings input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    #cswp_settings input[type="number"],
+    #cswp_settings input[type="text"],
+    #cswp_settings select {
+        font-size: 16px;
+        padding: 8px 10px;
+        min-height: 40px;
+    }
+    #cswp_settings select {
+        width: 160px;
+    }
+}
+
+/* ============ Mobile preview tooltip ============ */
+@media (max-width: 768px), (pointer: coarse) {
+    .cswp--preview {
+        max-width: 92vw;
+        left: 4vw !important;
+        right: 4vw;
+        font-size: 13px;
+        padding: 12px 14px;
+    }
+    .cswp--previewSnippet {
+        max-height: 120px;
+    }
+}
+
+/* ============ Utility: hide hover-only elements on touch ============ */
+@media (hover: none) {
+    .cswp--paletteFooter {
+        font-size: 9px;
+    }
+}
+
+/* ============ Select styling (settings) ============ */
+#cswp_settings select {
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 13px;
+    cursor: pointer;
+}
+#cswp_settings select:focus {
+    outline: none;
+    border-color: var(--SmartThemeQuoteColor, #7aa);
+}

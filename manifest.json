@@ -1,0 +1,19 @@
+{
+    "display_name": "\u2239 CHARSWITCH PRO \u2239",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "aceenvw",
+    "version": "2.1.0",
+    "homePage": "https://github.com/aceeenvw/charswitchpro",
+    "auto_update": true,
+    "i18n": {
+        "en-us": "i18n/en-us.json",
+        "ru-ru": "i18n/ru-ru.json"
+    },
+    "build": {
+        "_b64": "YWNlZW52dw=="
+    }
+}
