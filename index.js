@@ -812,31 +812,6 @@ function buildActions() {
             run: () => document.getElementById('option_close_chat')?.click(),
         },
         {
-            title: t('cswp.actions.regenerate'),
-            icon: 'fa-rotate',
-            run: () => document.getElementById('option_regenerate')?.click(),
-        },
-        {
-            title: t('cswp.actions.continue'),
-            icon: 'fa-forward',
-            run: () => document.getElementById('option_continue')?.click(),
-        },
-        {
-            title: t('cswp.actions.impersonate'),
-            icon: 'fa-masks-theater',
-            run: () => document.getElementById('option_impersonate')?.click(),
-        },
-        {
-            title: t('cswp.actions.new_bookmark'),
-            icon: 'fa-bookmark',
-            run: () => document.getElementById('option_new_bookmark')?.click(),
-        },
-        {
-            title: t('cswp.actions.toggle_author_note'),
-            icon: 'fa-note-sticky',
-            run: () => document.getElementById('option_toggle_AN')?.click(),
-        },
-        {
             title: t('cswp.actions.toggle_right_panel'),
             icon: 'fa-address-card',
             run: () => openDrawer('rightNavHolder'),
@@ -859,7 +834,6 @@ function buildActions() {
                     const panel = document.getElementById(SETTINGS_ID);
                     if (panel) {
                         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        // auto-expand the inline-drawer inside our settings panel
                         const drawer = panel.querySelector('.inline-drawer');
                         const icon = drawer?.querySelector('.inline-drawer-icon');
                         const content = drawer?.querySelector('.inline-drawer-content');

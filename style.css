@@ -325,11 +325,34 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
     white-space: nowrap;
     margin-top: 2px;
 }
+/* Fuzzy match highlight
+ * Strategy: no background fill (creates visual noise and reads poorly
+ * across light/dark themes). Use weight + accent color + subtle
+ * underline offset for Raycast/Linear-style clarity. When the row is
+ * focused, the accent color flips to inherit from the selected-state
+ * text so matches stay legible on the accent background. */
 .cswp--paletteItemMatch {
-    background: rgba(255, 220, 100, 0.25);
-    color: #ffe;
-    font-weight: 600;
-    border-radius: 2px;
+    color: var(--SmartThemeQuoteColor, #7ec8d4);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: currentColor;
+    text-underline-offset: 2px;
+    text-decoration-skip-ink: auto;
+}
+.cswp--paletteItem.cswp--focused .cswp--paletteItemMatch,
+.cswp--paletteItem:hover .cswp--paletteItemMatch {
+    color: inherit;
+    text-decoration-color: rgba(255, 255, 255, 0.8);
+}
+/* Inside quick menu list items — same treatment for consistency */
+.cswp--ctxItem .cswp--paletteItemMatch {
+    color: var(--SmartThemeQuoteColor, #7ec8d4);
+}
+.cswp--ctxItem.cswp--focused .cswp--paletteItemMatch,
+.cswp--ctxItem:hover .cswp--paletteItemMatch {
+    color: inherit;
+    text-decoration-color: rgba(255, 255, 255, 0.8);
 }
 .cswp--paletteFooter {
     padding: 6px 16px;
