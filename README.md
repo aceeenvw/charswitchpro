@@ -463,7 +463,3 @@ Ideas for future versions:
          Built with care for the SillyTavern community.
     ⊹                                                               ⊹
 ```
-
-**[↑ Back to top](#)**
-
-</div>
