@@ -31,6 +31,8 @@
     "cswp.palette.section_commands": "Slash Commands",
     "cswp.palette.no_results": "No results",
     "cswp.palette.loading_chats": "Searching chats...",
+    "cswp.palette.open": "Open palette",
+    "cswp.close": "Close",
     "cswp.actions.new_chat": "New chat with current character",
     "cswp.actions.close_chat": "Close current chat",
     "cswp.actions.regenerate": "Regenerate last message",

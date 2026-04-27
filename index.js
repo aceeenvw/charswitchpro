@@ -347,7 +347,18 @@ async function openQuickMenu(evt) {
     input.type = 'text';
     input.placeholder = t('cswp.search.placeholder');
     input.setAttribute('aria-label', 'Search characters');
-    search.append(input);
+    const ctxCloseBtn = document.createElement('button');
+    ctxCloseBtn.type = 'button';
+    ctxCloseBtn.className = 'cswp--closeBtn cswp--ctxClose';
+    ctxCloseBtn.setAttribute('aria-label', t('cswp.close') || 'Close');
+    ctxCloseBtn.setAttribute('title', t('cswp.close') || 'Close');
+    ctxCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    ctxCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeQuickMenu();
+    });
+    search.append(input, ctxCloseBtn);
 
     const tagBar = buildTagBar(() => renderList(list, input.value));
     menu.append(search, tagBar, list);
@@ -583,7 +594,18 @@ function openPalette(initialQuery = '') {
     input.className = 'cswp--paletteInput';
     input.placeholder = t('cswp.palette.placeholder');
     input.value = initialQuery;
-    inputWrap.append(icon, input);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'cswp--closeBtn cswp--paletteClose';
+    closeBtn.setAttribute('aria-label', t('cswp.close') || 'Close');
+    closeBtn.setAttribute('title', t('cswp.close') || 'Close');
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closePalette();
+    });
+    inputWrap.append(icon, input, closeBtn);
 
     const results = document.createElement('div');
     results.className = 'cswp--paletteResults';
@@ -607,6 +629,7 @@ function openPalette(initialQuery = '') {
     setCleanTimeout(() => { input.focus(); input.select(); }, 20);
 
     renderPalette(results, initialQuery);
+    updateFabState();
 }
 
 function closePalette() {
@@ -616,6 +639,7 @@ function closePalette() {
     paletteOpen = false;
     paletteItems = [];
     paletteFocusIdx = 0;
+    updateFabState();
 }
 
 async function renderPalette(container, query) {
@@ -1203,9 +1227,9 @@ function createFab() {
     fabEl = document.createElement('button');
     fabEl.id = 'cswp_fab';
     fabEl.className = 'cswp--fab';
-    fabEl.setAttribute('aria-label', 'Open CharSwitch Pro palette');
     fabEl.setAttribute('type', 'button');
     fabEl.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>';
+    updateFabState();
     fabEl.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -1213,6 +1237,22 @@ function createFab() {
     });
     document.body.append(fabEl);
     makeDraggable(fabEl);
+}
+
+function updateFabState() {
+    if (!fabEl) return;
+    const icon = fabEl.querySelector('i');
+    if (paletteOpen) {
+        fabEl.classList.add('cswp--fabActive');
+        fabEl.setAttribute('aria-label', t('cswp.close') || 'Close palette');
+        fabEl.setAttribute('title', t('cswp.close') || 'Close');
+        if (icon) icon.className = 'fa-solid fa-xmark';
+    } else {
+        fabEl.classList.remove('cswp--fabActive');
+        fabEl.setAttribute('aria-label', t('cswp.palette.open') || 'Open palette');
+        fabEl.setAttribute('title', t('cswp.palette.open') || 'Open palette');
+        if (icon) icon.className = 'fa-solid fa-magnifying-glass';
+    }
 }
 
 function removeFab() {

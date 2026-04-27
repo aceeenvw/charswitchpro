@@ -70,9 +70,13 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
     padding: 8px 12px;
     border-bottom: 1px solid var(--SmartThemeBorderColor, #333);
     background: transparent;
+    display: flex;
+    gap: 6px;
+    align-items: center;
 }
 .cswp--ctxSearch input {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     padding: 6px 10px;
     border: 1px solid var(--SmartThemeBorderColor, #444);
     border-radius: 4px;
@@ -84,6 +88,34 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
 .cswp--ctxSearch input:focus {
     border-color: var(--SmartThemeQuoteColor, #7aa);
 }
+
+/* ============ Close buttons (shared) ============ */
+.cswp--closeBtn {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--SmartThemeBodyColor, #ccc);
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 120ms, background 120ms, border-color 120ms;
+    -webkit-tap-highlight-color: transparent;
+}
+.cswp--closeBtn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--SmartThemeBorderColor, #444);
+}
+.cswp--closeBtn:active {
+    transform: scale(0.92);
+}
+.cswp--closeBtn i { pointer-events: none; }
 .cswp--ctxTags {
     display: flex;
     flex-wrap: wrap;
@@ -199,6 +231,18 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
     position: relative;
     padding: 12px 16px;
     border-bottom: 1px solid var(--SmartThemeBorderColor, #333);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cswp--paletteInputWrap > .cswp--paletteInput {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.cswp--paletteClose {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
 }
 .cswp--paletteInput {
     width: 100%;
@@ -431,6 +475,13 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
 }
 .cswp--fab:hover {
     background: var(--SmartThemeQuoteColor, #4a6a6a);
+}
+.cswp--fab.cswp--fabActive {
+    background: var(--SmartThemeEmColor, #a55);
+    z-index: 10002; /* above palette overlay */
+}
+.cswp--fab.cswp--fabActive:hover {
+    background: var(--SmartThemeEmColor, #b66);
 }
 .cswp--fab i { pointer-events: none; }
 
