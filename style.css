@@ -290,9 +290,30 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
     cursor: pointer;
     transition: background 120ms;
 }
+/* Selected-state text color — defaults to near-black, which works on
+ * all standard SmartThemeQuoteColor values (they tend to be pastel/
+ * mid-tone). Override in user CSS via `--cswp-selected-fg` if your
+ * custom theme has a dark accent color. */
+:root {
+    --cswp-selected-fg: #0e1720;
+    --cswp-selected-fg-muted: rgba(14, 23, 32, 0.65);
+    --cswp-selected-match-underline: rgba(14, 23, 32, 0.55);
+}
 .cswp--paletteItem:hover,
 .cswp--paletteItem.cswp--focused {
     background: var(--SmartThemeQuoteColor, #3a5a5a);
+    color: var(--cswp-selected-fg);
+}
+.cswp--paletteItem:hover .cswp--paletteItemTitle,
+.cswp--paletteItem.cswp--focused .cswp--paletteItemTitle,
+.cswp--paletteItem:hover .cswp--paletteItemIcon,
+.cswp--paletteItem.cswp--focused .cswp--paletteItemIcon {
+    color: var(--cswp-selected-fg);
+}
+.cswp--paletteItem:hover .cswp--paletteItemSubtitle,
+.cswp--paletteItem.cswp--focused .cswp--paletteItemSubtitle {
+    color: var(--cswp-selected-fg-muted);
+    opacity: 1;
 }
 .cswp--paletteItemIcon {
     width: 32px;
@@ -342,8 +363,8 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
 }
 .cswp--paletteItem.cswp--focused .cswp--paletteItemMatch,
 .cswp--paletteItem:hover .cswp--paletteItemMatch {
-    color: inherit;
-    text-decoration-color: rgba(255, 255, 255, 0.8);
+    color: var(--cswp-selected-fg);
+    text-decoration-color: var(--cswp-selected-match-underline);
 }
 /* Inside quick menu list items — same treatment for consistency */
 .cswp--ctxItem .cswp--paletteItemMatch {
@@ -352,7 +373,7 @@ body.cswp--nonDiscord .cswp--ctxBlocker > .cswp--ctxMenu {
 .cswp--ctxItem.cswp--focused .cswp--paletteItemMatch,
 .cswp--ctxItem:hover .cswp--paletteItemMatch {
     color: inherit;
-    text-decoration-color: rgba(255, 255, 255, 0.8);
+    text-decoration-color: currentColor;
 }
 .cswp--paletteFooter {
     padding: 6px 16px;
