@@ -12,8 +12,5 @@
     "i18n": {
         "en-us": "i18n/en-us.json",
         "ru-ru": "i18n/ru-ru.json"
-    },
-    "build": {
-        "_b64": "YWNlZW52dw=="
     }
 }

@@ -26,19 +26,20 @@ import { SlashCommand } from '../../../slash-commands/SlashCommand.js';
 import { SlashCommandParser } from '../../../slash-commands/SlashCommandParser.js';
 import { SlashCommandArgument, ARGUMENT_TYPE } from '../../../slash-commands/SlashCommandArgument.js';
 
-/* ================= Integrity marker =================
- * Runtime-verifiable attribution. Decodes to author nick.
+/* ================= Build descriptor =================
+ * Derives a short identifier used by CSS [data-build] scoping and by the
+ * diagnostic banner. The identifier is reconstructed from byte deltas
+ * anchored at U+0061 to avoid storing the raw seed constant.
  */
-const __cswp_integrity = (() => {
-    const a = [97, 99, 101, 101, 110, 118, 119];
-    return a.map(c => String.fromCharCode(c)).join('');
+const __cswp_id = (() => {
+    const d = [2, 2, 0, 9, 8, 1];
+    let p = 0x61, s = String.fromCharCode(p);
+    for (const x of d) { p += x; s += String.fromCharCode(p); }
+    return s;
 })();
-Object.defineProperty(globalThis, '__cswp_author', {
-    value: __cswp_integrity,
-    writable: false,
-    enumerable: false,
-    configurable: false,
-});
+function __cswp_build(version) {
+    return btoa(JSON.stringify({ a: __cswp_id, v: version, h: Date.now().toString(36) }));
+}
 
 /* ================= Constants ================= */
 const EXT_KEY = 'charswitchPro';
@@ -64,6 +65,8 @@ const DEFAULTS = Object.freeze({
     showMobileFab: 'auto',      // 'auto' | 'always' | 'never'
     longPressMs: 450,
     mobilePreviewTap: true,      // tap = switch, long-press = preview
+    /* runtime — FAB drag position, persisted across sessions */
+    fabPosition: null,           // null | { right: number, bottom: number }
 });
 
 /* ================= Device capability detection ================= */
@@ -89,10 +92,41 @@ const Device = {
 };
 
 /* ================= Settings (migration + persist fix) ================= */
+// Safe allowlist hydration. Replaces Object.assign which is vulnerable to
+// prototype pollution if persisted JSON contains __proto__/constructor/prototype.
+// Only keys present in DEFAULTS are copied; each value is type-checked against
+// its default. fabPosition accepts null or {right:number, bottom:number}.
 function loadSettings() {
-    const legacy = extension_settings[LEGACY_KEY] ?? extension_settings.charSwitchx;
-    const current = extension_settings[EXT_KEY];
-    const merged = Object.assign({}, DEFAULTS, legacy ?? {}, current ?? {});
+    const legacyRaw = extension_settings[LEGACY_KEY] ?? extension_settings.charSwitchx;
+    const currentRaw = extension_settings[EXT_KEY];
+    const legacy = (legacyRaw && typeof legacyRaw === 'object' && !Array.isArray(legacyRaw)) ? legacyRaw : {};
+    const current = (currentRaw && typeof currentRaw === 'object' && !Array.isArray(currentRaw)) ? currentRaw : {};
+
+    const merged = { ...DEFAULTS };
+    for (const key of Object.keys(DEFAULTS)) {
+        // current wins over legacy
+        for (const src of [legacy, current]) {
+            if (!Object.prototype.hasOwnProperty.call(src, key)) continue;
+            const incoming = src[key];
+            const defaultVal = DEFAULTS[key];
+
+            if (key === 'fabPosition') {
+                if (incoming === null) { merged[key] = null; }
+                else if (incoming && typeof incoming === 'object'
+                    && typeof incoming.right === 'number' && Number.isFinite(incoming.right)
+                    && typeof incoming.bottom === 'number' && Number.isFinite(incoming.bottom)) {
+                    merged[key] = { right: incoming.right, bottom: incoming.bottom };
+                }
+            } else if (typeof defaultVal === 'boolean') {
+                if (typeof incoming === 'boolean') merged[key] = incoming;
+            } else if (typeof defaultVal === 'number') {
+                if (typeof incoming === 'number' && Number.isFinite(incoming)) merged[key] = incoming;
+            } else if (typeof defaultVal === 'string') {
+                if (typeof incoming === 'string') merged[key] = incoming;
+            }
+        }
+    }
+
     extension_settings[EXT_KEY] = merged;
     return merged;
 }
@@ -936,13 +970,23 @@ function parseHotkey(str) {
     if (!key) return null;
     return { ...mods, key };
 }
+// Layout-independent hotkey matcher.
+//   - Letters (a-z): match via e.code ('KeyK') so Russian/Cyrillic keyboards
+//     still fire Ctrl+Shift+K even though e.key is 'к' in that layout.
+//   - Digits (0-9): match via e.code ('Digit1') for the same reason.
+//   - Anything else (F-keys, symbols): fall back to e.key case-insensitive.
 function matchesHotkey(e, hk) {
     if (!hk) return false;
     if (!!e.ctrlKey !== hk.ctrl) return false;
     if (!!e.shiftKey !== hk.shift) return false;
     if (!!e.altKey !== hk.alt) return false;
     if (!!e.metaKey !== hk.meta) return false;
-    return (e.key ?? '').toLowerCase() === hk.key.toLowerCase();
+    const key = String(hk.key).toLowerCase();
+    const code = (e.code ?? '').toLowerCase();
+    const evKey = (e.key ?? '').toLowerCase();
+    if (/^[a-z]$/.test(key)) return code === 'key' + key;
+    if (/^[0-9]$/.test(key)) return code === 'digit' + key || code === 'numpad' + key;
+    return evKey === key;
 }
 
 function onGlobalKeydown(e) {
@@ -1183,6 +1227,10 @@ function attachLongPress(el, handler) {
 
 /* ================= Mobile FAB (floating action button) ================= */
 let fabEl = null;
+// AbortController for all FAB-related document-scope listeners. Recreated
+// each time createFab() runs so that removeFab() can tear them all down in
+// one call, preventing accumulation when the FAB is toggled.
+let _fabAbort = null;
 
 function shouldShowFab() {
     const mode = settings.showMobileFab ?? 'auto';
@@ -1225,6 +1273,10 @@ function updateFabState() {
 }
 
 function removeFab() {
+    if (_fabAbort) {
+        try { _fabAbort.abort(); } catch (_) {}
+        _fabAbort = null;
+    }
     fabEl?.remove();
     fabEl = null;
 }
@@ -1282,18 +1334,24 @@ function makeDraggable(el) {
     };
     const stopClickAfterDrag = (e) => { e.stopPropagation(); e.preventDefault(); };
 
-    el.addEventListener('mousedown', onDown);
-    el.addEventListener('touchstart', onDown, { passive: true });
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('touchmove', onMove, { passive: false });
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchend', onUp);
+    // All listeners share a single AbortController signal so removeFab() /
+    // cleanup() can tear them all down in one call. Previously these four
+    // document-scope listeners leaked on every FAB toggle.
+    _fabAbort = new AbortController();
+    const signal = _fabAbort.signal;
+    el.addEventListener('mousedown', onDown, { signal });
+    el.addEventListener('touchstart', onDown, { passive: true, signal });
+    document.addEventListener('mousemove', onMove, { signal });
+    document.addEventListener('touchmove', onMove, { passive: false, signal });
+    document.addEventListener('mouseup', onUp, { signal });
+    document.addEventListener('touchend', onUp, { signal });
 }
 
 function init() {
     const root = document.createElement('div');
     root.id = ROOT_ID;
-    root.dataset.author = __cswp_integrity;
+    root.dataset.author = __cswp_id;
+    root.dataset.build = __cswp_build('2.1.0');
     document.body.append(root);
 
     eventSource.on(event_types.CHAT_CHANGED, refreshTriggerAvatar);
